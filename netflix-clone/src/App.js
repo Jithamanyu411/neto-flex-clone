@@ -3,11 +3,13 @@ import React from 'react';
 import './App.css';
 import requests from './requests';
 import Row from './Row';
+import Banner from './Banner';
 
 function App() {
   return (
-    <div className="App">
-    <h1>Let's Build a Netflix-Clone</h1>
+    <div className="app">
+    {/* Nav */}
+    <Banner />
     {/* rows */}
     <Row 
     title = "Netflix Originals"  
