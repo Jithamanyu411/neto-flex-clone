@@ -1,10 +1,14 @@
 import React , { useEffect, useState } from 'react';
 import axios from './axios';
 import './Row.css';
+import Youtube from "react-youtube";
+import movieTrailer from 'movie-trailer';
 
  const baseUrl ="https://image.tmdb.org/t/p/original";
+
 function Row( {title,fetchUrl, isLargeRow}) {
    const [movies, setMovies] = useState([])
+   const [trailerUrl,setTrailerUrl] = useState("");
 
   // useeffect runs on specific conditions
   useEffect(() => {
@@ -17,7 +21,28 @@ function Row( {title,fetchUrl, isLargeRow}) {
     fetchData();
   }, [fetchUrl]);
 
-  console.log(movies)
+  //  options for react youtube to play
+  const opts = {
+    height: '390',
+    width: '100%',
+    playerVars: {
+      autoplay: 1,
+    },
+  };
+
+    const handleClick = (movie) => {
+      if (trailerUrl) {
+        setTrailerUrl("");
+      }else{
+        movieTrailer(movie?.name || movie?.title || "")
+        .then((url) => {
+          //  this will give us the ID of YT video.. v="" is the ID of any YT video
+          const urlParams = new URLSearchParams(new URL(url).search);
+           setTrailerUrl(urlParams.get('v'));
+        })
+        .catch((error) => console.log(error));
+      }
+    };
  
 
     return (
@@ -26,8 +51,9 @@ function Row( {title,fetchUrl, isLargeRow}) {
 
        <div className="row_posters">
        {/* this is for row wise posters */}
-       {movies.map(movie => (
+       {movies.map((movie) => (
          <img 
+            onClick={() => handleClick(movie)}
           key = {movie.id}
           className={`row_poster ${isLargeRow && "row_posterLarge"} `}
           src ={`${baseUrl}${
@@ -36,7 +62,8 @@ function Row( {title,fetchUrl, isLargeRow}) {
           alt={movie.name} />
        ))} 
 
-       </div>   
+       </div>  
+       {trailerUrl && <Youtube videoId={trailerUrl} opts={opts} />} 
       </div>
     );
   }
